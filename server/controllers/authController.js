@@ -50,6 +50,7 @@ export const loginInitiate = async (req, res) => {
 
     res.status(200).json({ message: 'OTP sent to email', email });
   } catch (error) {
+    console.log("asli",error);
     res.status(500).json({ message: error.message });
   }
 };
