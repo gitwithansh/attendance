@@ -19,7 +19,7 @@ export const register = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
+console.log("api hit for imal logn",req.body.email);
 export const loginInitiate = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -33,7 +33,7 @@ export const loginInitiate = async (req, res) => {
     admin.otp = otp;
     admin.otpExpires = Date.now() + 10 * 60 * 1000; // 10 mins
     await admin.save();
-
+console.log("nodemailer");
     await transporter.sendMail({
       from: `"Blinkit Admin Portal" <${process.env.EMAIL_USER}>`,
       to: email,
@@ -47,7 +47,7 @@ export const loginInitiate = async (req, res) => {
         </div>
       `
     });
-
+console.log("end nodemailer")
     res.status(200).json({ message: 'OTP sent to email', email });
   } catch (error) {
     console.log("asli",error);
