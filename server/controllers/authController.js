@@ -19,8 +19,9 @@ export const register = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-console.log("api hit for imal logn",req.body.email);
+
 export const loginInitiate = async (req, res) => {
+  console.log("api hit for imal logn",req.body.email);
   try {
     const { email, password } = req.body;
     const admin = await Admin.findOne({ email });
