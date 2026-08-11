@@ -6,6 +6,7 @@ import { transporter } from '../config/nodemailer.js';
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 
 export const register = async (req, res) => {
+  console.log("register hit",req.body);
   try {
     const { name, email, password } = req.body;
     let adminExists = await Admin.findOne({ email });
@@ -16,6 +17,7 @@ export const register = async (req, res) => {
 
     res.status(201).json({ message: 'Registration successful. Please login.' });
   } catch (error) {
+    console.log("register crash error",error);
     res.status(500).json({ message: error.message });
   }
 };
