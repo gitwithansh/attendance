@@ -36,21 +36,39 @@ export const loginInitiate = async (req, res) => {
     admin.otp = otp;
     admin.otpExpires = Date.now() + 10 * 60 * 1000; // 10 mins
     await admin.save();
-console.log("nodemailer");
-    await transporter.sendMail({
-      from: `"Blinkit Admin Portal" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: 'Blinkit Portal Login Verification OTP',
-      html: `
-        <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
-          <h2 style="color: #f7c200; background: #0c831f; padding: 10px; border-radius: 4px;">Blinkit Admin Authentication</h2>
-          <p>Your OTP code for admin portal login verification is:</p>
-          <h1 style="color: #0c831f; letter-spacing: 4px;">${otp}</h1>
-          <p>This OTP is valid for 10 minutes.</p>
-        </div>
-      `
-    });
-console.log("end nodemailer")
+console.log("👉 Sending email via Brevo API...");
+        
+        // --- BREVO HTTP API CODE ---
+        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+            method: 'POST',
+            headers: {
+                'accept': 'application/json',
+                'content-type': 'application/json',
+                'api-key': process.env.BREVO_API_KEY
+            },
+            body: JSON.stringify({
+                sender: { email: process.env.EMAIL_USER, name: 'Blinkit Admin' },
+                to: [{ email: email }],
+                subject: 'Blinkit Portal Login Verification OTP',
+                htmlContent: `
+                    <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #e0e0e0;">
+                        <h2 style="color: #f7c200; background: #0c831f; padding: 10px; border-radius: 4px;">
+                            Your OTP code for admin portal login verification is:
+                        </h2>
+                        <h1 style="color: #0c831f; letter-spacing: 4px;">${otp}</h1>
+                        <p>This OTP is valid for 10 minutes.</p>
+                    </div>
+                `
+            })
+        });
+if (!response.ok) {
+            const errData = await response.json();
+            console.error("🚨 Brevo API Error:", errData);
+            throw new Error("Failed to send email via Brevo");
+        }
+        // --- BREVO HTTP API CODE END ---
+
+        console.log("✅ Email sent successfully via Brevo!");
     res.status(200).json({ message: 'OTP sent to email', email });
   } catch (error) {
     console.log("asli",error);
